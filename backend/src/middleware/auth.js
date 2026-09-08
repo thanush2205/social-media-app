@@ -2,6 +2,29 @@ const { verifyToken } = require('../utils/jwt');
 const User = require('../models/User');
 
 /**
+ * Optional auth middleware - used on public endpoints.
+ * If a valid Bearer token is present it attaches the user to req.user,
+ * but it never rejects the request (the endpoint stays public).
+ */
+const optionalAuth = async (req, res, next) => {
+  try {
+    const authHeader = req.headers.authorization;
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      const payload = verifyToken(authHeader.split(' ')[1]);
+      if (payload) {
+        const user = await User.findById(payload.id).select(
+          'name email avatar createdAt'
+        );
+        if (user) req.user = user;
+      }
+    }
+  } catch {
+    // ignore - the endpoint remains public
+  }
+  next();
+};
+
+/**
  * Auth middleware - protects routes by verifying the Bearer token
  * and attaching the authenticated user to req.user.
  */
@@ -34,4 +57,4 @@ const protect = async (req, res, next) => {
   }
 };
 
-module.exports = { protect };
+module.exports = { protect, optionalAuth };
