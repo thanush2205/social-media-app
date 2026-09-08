@@ -55,7 +55,7 @@ export default function Navbar() {
         >
           <ForumIcon color="primary" />
           <Typography variant="h6" fontWeight={800} letterSpacing={-0.5}>
-            ConnectHub
+            SparksHub
           </Typography>
         </Box>
 

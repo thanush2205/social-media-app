@@ -97,7 +97,7 @@ export default function SignupPage() {
         <Stack spacing={1} alignItems="center" sx={{ mb: 3 }}>
           <ForumIcon color="primary" sx={{ fontSize: 44 }} />
           <Typography variant="h5" fontWeight={800} letterSpacing={-0.5}>
-            Join ConnectHub
+            Join SparksHub
           </Typography>
           <Typography variant="body2" color="text.secondary">
             Create an account and share your thoughts with the world.

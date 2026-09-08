@@ -1,6 +1,6 @@
-# ConnectHub
+# SparksHub
 
-ConnectHub is a full-stack social feed built with React, Node.js, Express, MongoDB, and Cloudinary. Users can create accounts, publish text or image posts, browse a paginated feed, like posts, and add comments.
+SparksHub is a full-stack social feed built with React, Node.js, Express, MongoDB, and Cloudinary. Users can create accounts, publish text or image posts, browse a paginated feed, like posts, and add comments.
 
 ## Features
 
