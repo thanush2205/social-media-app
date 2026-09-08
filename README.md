@@ -1,199 +1,110 @@
-# 📣 ConnectHub — Mini Social Post Application
+# ConnectHub
 
-A TaskPlanet-style social feed built for the **3W Full Stack Internship Assignment**.
-Users can create accounts, post text and/or images, browse a public feed, like, and comment —
-with instant UI updates and efficient cursor-based pagination.
+ConnectHub is a full-stack social feed built with React, Node.js, Express, MongoDB, and Cloudinary. Users can create accounts, publish text or image posts, browse a paginated feed, like posts, and add comments.
 
-![Stack](https://img.shields.io/badge/Stack-React%20%2B%20Node%20%2B%20MongoDB-6366f1)
+## Features
 
----
+- JWT authentication with bcrypt password hashing
+- Text and image posts with Cloudinary uploads
+- Cursor-based feed pagination and infinite scroll
+- Likes and comments with optimistic UI updates
+- Responsive Material UI interface with persisted light and dark modes
 
-## ✨ Features
+## Stack
 
-- **Account creation** — signup/login with email + password (bcrypt hashed, JWT auth)
-- **Create post** — text-only, image-only, or both (Cloudinary hosted images)
-- **Public feed** — all posts from all users, newest first, infinite scroll
-- **Likes & comments** — toggle likes, add comments, both update instantly in the UI
-- **Username tracking** — likedByMe state per user; comments store the commenter's profile
-- **Dark / light mode** — persisted preference
-- **Responsive layout** — mobile-first, works across devices
-- **Cursor-based pagination** — no page duplicates, efficient indexed queries
+- **Frontend:** React 18, Vite, React Router, Material UI, Axios
+- **Backend:** Node.js, Express, Mongoose, JWT, Multer
+- **Services:** MongoDB Atlas and Cloudinary
 
----
+## Project Structure
 
-## 🧱 Project Structure
-
-```
-social-media-app/
-├── backend/                # Node.js + Express + MongoDB (Mongoose)
-│   ├── src/
-│   │   ├── config/         # MongoDB connection
-│   │   ├── controllers/    # auth & post business logic
-│   │   ├── middleware/     # JWT auth, file upload, error handlers
-│   │   ├── models/         # User, Post  (ONLY 2 collections)
-│   │   ├── routes/         # /api/auth, /api/posts
-│   │   ├── utils/          # JWT + Cloudinary helpers
-│   │   └── server.js       # Express app entry
-│   └── package.json
-└── frontend/               # React (Vite) + Material UI
-    ├── src/
-    │   ├── api/            # axios client + endpoint modules
-    │   ├── components/     # Navbar, PostCard, CommentSection, UserAvatar
-    │   ├── context/        # AuthContext, ColorModeContext
-    │   ├── pages/          # Login, Signup, Feed, CreatePost
-    │   ├── utils/          # formatting helpers
-    │   └── App.jsx
-    └── package.json
+```text
+backend/
+  src/config       Database connection
+  src/controllers  Authentication and post logic
+  src/middleware   Auth, uploads, and error handling
+  src/models       User and Post models
+  src/routes       API routes
+  src/utils        JWT and Cloudinary helpers
+frontend/
+  src/api          API clients
+  src/components   Shared UI components
+  src/context      Auth and color mode state
+  src/pages        Login, signup, feed, and post creation
 ```
 
----
+## Local Development
 
-## 🚀 Local Setup
+### Requirements
 
-### Prerequisites
-- Node.js ≥ 18
-- A MongoDB instance (local or free [MongoDB Atlas](https://cloud.mongodb.com/) cluster)
-- A free [Cloudinary](https://cloudinary.com/) account for image uploads
+- Node.js 18 or newer
+- MongoDB, local or Atlas
+- Cloudinary account for image uploads
 
-### 1. Backend
+### Backend
 
 ```bash
 cd backend
 npm install
-cp .env.example .env   # fill in your values
-npm run dev            # http://localhost:5000
+cp .env.example .env
+npm run dev
 ```
 
-`.env` keys:
+Configure these values in `backend/.env`:
 
-| Key | Description |
-|---|---|
+| Variable | Purpose |
+| --- | --- |
 | `MONGO_URI` | MongoDB connection string |
-| `JWT_SECRET` | Random long secret (`node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`) |
-| `CLOUDINARY_CLOUD_NAME` | From Cloudinary dashboard |
-| `CLOUDINARY_API_KEY` | From Cloudinary dashboard |
-| `CLOUDINARY_API_SECRET` | From Cloudinary dashboard |
-| `CLIENT_URLS` | Comma-separated allowed frontend origins (default `http://localhost:5173`) |
-| `PORT` | Default `5000` |
+| `JWT_SECRET` | Long, random signing secret |
+| `JWT_EXPIRES_IN` | Token lifetime, for example `7d` |
+| `CLOUDINARY_CLOUD_NAME` | Cloudinary cloud name |
+| `CLOUDINARY_API_KEY` | Cloudinary API key |
+| `CLOUDINARY_API_SECRET` | Cloudinary API secret |
+| `CLIENT_URLS` | Allowed frontend origins |
+| `PORT` | API port, default `5000` |
 
-### 2. Frontend
+### Frontend
 
 ```bash
 cd frontend
 npm install
-cp .env.example .env   # set VITE_API_URL to http://localhost:5000/api
-npm run dev            # http://localhost:5173
+cp .env.example .env
+npm run dev
 ```
 
----
+Set `VITE_API_URL` in `frontend/.env` to `http://localhost:5000/api`. The frontend runs at `http://localhost:5173` by default.
 
-## 🔌 API Reference
+## API Overview
 
 Base URL: `http://localhost:5000/api`
 
-### Authentication
-| Method | Endpoint | Body | Description |
-|---|---|---|---|
-| `POST` | `/auth/signup` | `{ name, email, password }` | Create account, returns token + user |
-| `POST` | `/auth/login` | `{ email, password }` | Log in, returns token + user |
-| `GET` | `/auth/me` | — | Current user (Bearer token) |
+| Method | Endpoint | Auth | Description |
+| --- | --- | --- | --- |
+| `POST` | `/auth/signup` | No | Create an account |
+| `POST` | `/auth/login` | No | Authenticate a user |
+| `GET` | `/auth/me` | Yes | Get the current user |
+| `GET` | `/posts?cursor=&limit=` | No | Fetch the public feed |
+| `GET` | `/posts/:id` | No | Fetch one post |
+| `POST` | `/posts` | Yes | Create a text or image post |
+| `POST` | `/posts/:id/like` | Yes | Toggle a like |
+| `POST` | `/posts/:id/comment` | Yes | Add a comment |
 
-### Posts
-| Method | Endpoint | Body | Description |
-|---|---|---|---|
-| `GET` | `/posts?cursor=&limit=` | — | Public feed (cursor pagination, newest first) |
-| `GET` | `/posts/:id` | — | Single post |
-| `POST` | `/posts` | `FormData(text?, image?)` | Create post (**protected**) |
-| `POST` | `/posts/:id/like` | — | Toggle like (**protected**) |
-| `POST` | `/posts/:id/comment` | `{ text }` | Add comment (**protected**) |
+## Deployment
 
-**Feed response shape:**
-```json
-{
-  "posts": [
-    {
-      "_id": "...",
-      "text": "...",
-      "image": "https://...",
-      "createdAt": "...",
-      "user": { "_id": "...", "name": "Alice", "avatar": "" },
-      "likesCount": 3,
-      "commentsCount": 1,
-      "likedByMe": false,
-      "comments": [ { "_id": "...", "text": "...", "user": { "name": "Bob" } } ]
-    }
-  ],
-  "nextCursor": "...",
-  "hasMore": true
-}
-```
+### Frontend: Vercel
 
----
+1. Import the repository and set the root directory to `frontend`.
+2. Set `VITE_API_URL` to the deployed backend API URL.
+3. Deploy with the default Vite build settings.
 
-## 📦 Database Design (2 collections)
+The included `frontend/vercel.json` enables SPA routing.
 
-```
-User {
-  name: String,
-  email: String,        // unique, lowercased
-  passwordHash: String, // bcrypt
-  avatar: String,       // url
-  timestamps
-}
+### Backend: Render
 
-Post {
-  user: ObjectId ➜ User,
-  text: String,         // optional
-  image: String,        // optional (Cloudinary URL)
-  likes: [ObjectId ➜ User],          // who liked
-  comments: [ { user: ObjectId, text: String, timestamps } ],
-  timestamps
-  // indexed on (createdAt, _id) for cursor pagination
-}
-```
+1. Create a web service with root directory `backend`.
+2. Use `npm install` as the build command and `npm start` as the start command.
+3. Add the backend environment variables and set `CLIENT_URLS` to the deployed frontend URL.
 
----
+## License
 
-## 🌐 Deployment Guide
-
-### Frontend → Vercel
-1. Push this repo to GitHub.
-2. In Vercel, **New Project → Import** the repo → set **Root Directory** to `frontend`.
-3. Add env var: `VITE_API_URL=https://<your-backend>.onrender.com/api`
-4. Build command auto-detected (`vite build`), output `dist`.
-5. Deploy. SPA routing is handled by `vercel.json` rewrite rules.
-
-### Backend → Render
-1. In Render, **New Web Service → connect your repo** → Root Directory `backend`.
-2. Build command: `npm install` → Start command: `npm start`.
-3. Add env vars: `MONGO_URI`, `JWT_SECRET`, `CLOUDINARY_*`, `CLIENT_URLS=https://<your-frontend>.vercel.app`
-4. Deploy; copy the `.onrender.com` URL into the frontend's `VITE_API_URL`.
-
-### Database → MongoDB Atlas (free)
-1. Create a free cluster →
-2. Database Access → create a DB user (remember the password) →
-3. Network Access → allow `0.0.0.0/0` (for Render) →
-4. Connect → Drivers → copy the connection string into the backend's `MONGO_URI`.
-
----
-
-## ✅ Assignment Checklist
-
-- [x] Account creation with email + password (stored in MongoDB)
-- [x] Create posts with text and/or image (neither field mandatory — at least one required)
-- [x] Public feed showing all users' posts (username, content, likes, comment count)
-- [x] Like & comment on any post, with total counts
-- [x] Usernames of likers/commenters saved in the database
-- [x] React.js frontend + Node/Express backend + MongoDB
-- [x] Material UI styling (no Tailwind)
-- [x] Clean UI inspired by TaskPlanet social feed
-- [x] Basic auth flow: signup → login → create post → view feed
-- [x] Instant like/comment updates
-- [x] Cursor-based pagination (bonus)
-- [x] Well-structured, commented, reusable code
-
----
-
-## 📄 License
-
-MIT — free to use for the assignment.
+MIT

@@ -16,6 +16,10 @@ const lightTheme = createTheme({
       default: '#f5f6fa',
       paper: '#ffffff',
     },
+    text: {
+      primary: '#172033',
+      secondary: '#5f6b7a',
+    },
   },
   shape: { borderRadius: 14 },
   typography: {
@@ -34,6 +38,10 @@ const darkTheme = createTheme({
     background: {
       default: '#0f1117',
       paper: '#1a1d27',
+    },
+    text: {
+      primary: '#f5f7fb',
+      secondary: '#aab3c2',
     },
   },
   shape: { borderRadius: 14 },

@@ -187,7 +187,7 @@ export default function FeedPage() {
       <Box ref={sentinelRef} sx={{ py: 3, textAlign: 'center' }}>
         {loadingMore && <CircularProgress size={28} />}
         {!loadingMore && nextCursor && (
-          <Button onClick={loadMore} sx={{ textTransform: 'none' }} color="inherit">
+          <Button onClick={loadMore} sx={{ textTransform: 'none' }} color="primary">
             Load more posts
           </Button>
         )}

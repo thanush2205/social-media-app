@@ -75,7 +75,7 @@ export default function Navbar() {
         )}
 
         <Tooltip title={mode === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}>
-          <IconButton onClick={toggleColorMode} color="inherit">
+          <IconButton onClick={toggleColorMode} color="primary">
             {mode === 'dark' ? <LightIcon /> : <DarkIcon />}
           </IconButton>
         </Tooltip>
